@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>やじゅタイプ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>やじゅタイプ！</h1>
+        <p id="instructions">画面に表示される言葉をタイピングしよう！</p>
+        <div id="game-area">
+            <div id="target-word"></div>
+            <input type="text" id="input-area" placeholder="ここにタイピング！">
+            <p id="timer">残り時間: 45秒</p>
+            <p id="score">スコア: 0</p>
+        </div>
+        <button id="start-button">ゲーム開始</button>
+    </div>
+
+    <audio id="type-sound" src="click.mp3"></audio>
+    <audio id="game-over-sound" src="buy_sound.mp3"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
