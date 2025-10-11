@@ -3,9 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 1. 仮名 → ローマ字マップ（完全対応）
   // ===================================
   const kanaToRomaji = {
-    // 単母音
     あ:["a"],い:["i"],う:["u"],え:["e"],お:["o"],
-    // 子音行
     か:["ka"],き:["ki"],く:["ku"],け:["ke"],こ:["ko"],
     さ:["sa"],し:["shi","si","ci"],す:["su"],せ:["se"],そ:["so"],
     た:["ta"],ち:["chi","ti"],つ:["tsu","tu"],て:["te"],と:["to"],
@@ -15,13 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
     や:["ya"],ゆ:["yu"],よ:["yo"],
     ら:["ra"],り:["ri"],る:["ru"],れ:["re"],ろ:["ro"],
     わ:["wa"],を:["wo"],ん:["n","nn"],
-    // 濁音・半濁音
     が:["ga"],ぎ:["gi"],ぐ:["gu"],げ:["ge"],ご:["go"],
     ざ:["za"],じ:["ji","zi"],ず:["zu"],ぜ:["ze"],ぞ:["zo"],
     だ:["da"],ぢ:["ji","di"],づ:["zu","du"],で:["de"],ど:["do"],
     ば:["ba"],び:["bi"],ぶ:["bu"],べ:["be"],ぼ:["bo"],
     ぱ:["pa"],ぴ:["pi"],ぷ:["pu"],ぺ:["pe"],ぽ:["po"],
-    // 拗音
     きゃ:["kya"],きゅ:["kyu"],きょ:["kyo"],
     しゃ:["sha","sya"],しゅ:["shu","syu"],しょ:["sho","syo"],
     ちゃ:["cha","tya","cya"],ちゅ:["chu","tyu","cyu"],ちょ:["cho","tyo","cyo"],
@@ -38,13 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
     てぃ:["ti"],でぃ:["di"],どぅ:["du"],
     うぃ:["wi"],うぇ:["we"],うぉ:["wo"],
     ヴぁ:["va"],ヴぃ:["vi"],ヴ:["vu"],ヴぇ:["ve"],ヴぉ:["vo"],
-    // 小文字系
+    // 小文字
     ぁ:["xa","la"],ぃ:["xi","li"],ぅ:["xu","lu"],ぇ:["xe","le"],ぉ:["xo","lo"],
-    ゃ:["xya","lya"],ゅ:["xyu","lyu"],ょ:["xyo","lyo"],っ:["xtu","ltu","xtsu","ltsu"],
+    ゃ:["xya","lya"],ゅ:["xyu","lyu"],ょ:["xyo","lyo"],
+    っ:["xtu","ltu","xtsu","ltsu"]
   };
 
   // ===================================
-  // 2. 単語データ
+  // 2. 単語リスト
   // ===================================
   const words = [
     { jp: "フェラーリ", reading: "ふぇらーり" },
@@ -69,16 +66,15 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   // ===================================
-  // 3. 状態変数
+  // 3. 状態管理
   // ===================================
   let currentWord = {};
   let kanaIndex = 0;
-  let currentRomaji = "";
-  let typed = "";
+  let typedRomaji = "";
   let time = 45;
   let timer;
   let score = 0;
-  let typedList = [];
+  let typedWords = [];
 
   // ===================================
   // 4. 要素取得
@@ -99,15 +95,15 @@ document.addEventListener("DOMContentLoaded", () => {
   typingArea.prepend(progressBar);
 
   // ===================================
-  // 5. 仮名をローマ字列へ展開
+  // 5. 仮名→ローマ字列展開
   // ===================================
-  function kanaToRomajiSequence(kana) {
-    const result = [];
+  function toRomajiSequence(kana) {
+    let result = [];
     let i = 0;
     while (i < kana.length) {
-      let next2 = kana.slice(i, i + 2);
-      if (kanaToRomaji[next2]) {
-        result.push(kanaToRomaji[next2]);
+      const pair = kana.slice(i, i + 2);
+      if (kanaToRomaji[pair]) {
+        result.push(kanaToRomaji[pair]);
         i += 2;
       } else if (kanaToRomaji[kana[i]]) {
         result.push(kanaToRomaji[kana[i]]);
@@ -118,18 +114,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===================================
-  // 6. ゲーム制御
+  // 6. ゲーム開始
   // ===================================
   function startGame() {
     startScreen.classList.add("hidden");
     resultScreen.classList.add("hidden");
     typingArea.classList.remove("hidden");
     score = 0;
-    typedList = [];
+    typedWords = [];
     time = 45;
     timerEl.textContent = time;
     progressBar.style.width = "100%";
     nextWord();
+
     timer = setInterval(() => {
       time--;
       timerEl.textContent = time;
@@ -138,84 +135,121 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
 
+  // ===================================
+  // 7. 新しい単語
+  // ===================================
   function nextWord() {
     currentWord = words[Math.floor(Math.random() * words.length)];
     kanaIndex = 0;
-    currentRomaji = "";
-    typed = "";
+    typedRomaji = "";
     readingEl.textContent = currentWord.reading;
     wordEl.textContent = currentWord.jp;
     updateDisplay();
   }
 
-  function endGame() {
-    clearInterval(timer);
-    typingArea.classList.add("hidden");
-    resultScreen.classList.remove("hidden");
-    scoreEl.textContent = score;
-    wordListEl.innerHTML = typedList.map(w => `<li>${w}</li>`).join("");
-  }
-
   // ===================================
-  // 7. 表示更新
+  // 8. 表示更新
   // ===================================
   function updateDisplay() {
-    romajiEl.innerHTML = `<span class="typed">${typed}</span>${currentRomaji.slice(typed.length)}`;
+    const romajiSeq = toRomajiSequence(currentWord.reading).flat()[kanaIndex] || "";
+    romajiEl.innerHTML = `<span class="typed">${typedRomaji}</span>${romajiSeq.slice(typedRomaji.length)}`;
   }
 
   // ===================================
-  // 8. 入力処理
+  // 9. 入力処理
   // ===================================
   document.addEventListener("keydown", (e) => {
     if (typingArea.classList.contains("hidden")) return;
     const key = e.key.toLowerCase();
     if (!/^[a-z]$/.test(key)) return;
 
-    const kanaArray = kanaToRomajiSequence(currentWord.reading);
-    if (kanaIndex >= kanaArray.length) return;
+    const kanaSeq = toRomajiSequence(currentWord.reading);
+    if (kanaIndex >= kanaSeq.length) return;
 
-    let options = kanaArray[kanaIndex];
-    let progress = typed.slice(typed.lastIndexOf(" ") + 1);
+    let currentKana = currentWord.reading[kanaIndex];
+    let romajiOptions = kanaSeq[kanaIndex];
     let matched = false;
 
-    // 促音処理（っ）
-    if (currentWord.reading[kanaIndex] === "っ" && kanaArray[kanaIndex + 1]) {
-      const nextOptions = kanaArray[kanaIndex + 1];
-      for (let o of nextOptions) {
-        if (key === o[0]) {
+    // ==== 「ん」特別処理 ====
+    if (currentKana === "ん") {
+      const nextKana = currentWord.reading[kanaIndex + 1];
+      const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
+      const nextInitial = nextRomaji ? nextRomaji[0] : "";
+      if (key === "n") {
+        if ("aiueony".includes(nextInitial)) {
+          // 次が母音系 → nだけでは未確定
+          typedRomaji += key;
+          matched = true;
+        } else {
+          // 次が子音系 → nで確定
+          typedRomaji += key;
           kanaIndex++;
           matched = true;
+        }
+      }
+    }
+
+    // ==== 通常処理 ====
+    if (!matched) {
+      for (let opt of romajiOptions) {
+        if (opt.startsWith(typedRomaji + key)) {
+          typedRomaji += key;
+          matched = true;
+          if (typedRomaji === opt) {
+            kanaIndex++;
+            typedRomaji = "";
+          }
           break;
         }
       }
     }
 
-    for (let o of options) {
-      if ((progress + key) === o.slice(0, progress.length + 1)) {
-        typed += key;
-        matched = true;
-
-        // その音が完了したら次へ
-        if (typed.endsWith(o)) kanaIndex++;
-        break;
+    // ==== 促音（っ） ====
+    if (!matched && currentKana === "っ") {
+      const nextKana = currentWord.reading[kanaIndex + 1];
+      if (nextKana) {
+        const nextOpt = kanaToRomaji[nextKana]?.[0];
+        if (nextOpt && key === nextOpt[0]) {
+          kanaIndex++;
+          matched = true;
+        }
       }
     }
 
-    if (!matched) {
-      romajiEl.classList.add("mistype");
-      setTimeout(() => romajiEl.classList.remove("mistype"), 150);
-    } else {
+    // ==== 長音（ー） ====
+    if (!matched && currentKana === "ー") {
+      typedRomaji += key;
+      kanaIndex++;
+      matched = true;
+    }
+
+    // ==== 結果 ====
+    if (matched) {
       updateDisplay();
-      if (kanaIndex >= kanaArray.length) {
+      if (kanaIndex >= kanaSeq.length) {
         score++;
-        typedList.push(currentWord.jp);
+        typedWords.push(currentWord.jp);
         nextWord();
       }
+    } else {
+      romajiEl.classList.add("mistype");
+      setTimeout(() => romajiEl.classList.remove("mistype"), 150);
     }
   });
 
   // ===================================
-  // 9. ボタン
+  // 10. 終了
+  // ===================================
+  function endGame() {
+    clearInterval(timer);
+    typingArea.classList.add("hidden");
+    resultScreen.classList.remove("hidden");
+    scoreEl.textContent = score;
+    wordListEl.innerHTML = typedWords.map(w => `<li>${w}</li>`).join("");
+  }
+
+  // ===================================
+  // 11. ボタン
   // ===================================
   startBtn.addEventListener("click", startGame);
   retryBtn.addEventListener("click", startGame);
