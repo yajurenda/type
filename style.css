@@ -107,3 +107,23 @@ button:hover {
   color: limegreen;
   font-weight: bold;
 }
+
+#progress-bar {
+  height: 8px;
+  background-color: limegreen;
+  width: 100%;
+  transition: width 1s linear;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+.mistype {
+  animation: blink-red 0.15s ease;
+}
+@keyframes blink-red {
+  0% { color: red; }
+  100% { color: black; }
+}
+#romaji .typed {
+  color: limegreen;
+  font-weight: bold;
+}
