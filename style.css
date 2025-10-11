@@ -142,3 +142,19 @@ button:hover {
   0% { color: red; }
   100% { color: inherit; }
 }
+
+.footer-link {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  color: #3b82f6; /* 青色 */
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #2563eb; /* 濃い青 */
+  transform: scale(1.1);
+}
