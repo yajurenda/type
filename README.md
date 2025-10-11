@@ -33,7 +33,11 @@ https://tdkrtype.vercel.app
 </details>
 
 # こーど
-
+https://github.com/yajurenda/type
 
 # つくったひと
 田所工事中 ( https://bento.me/tdkrkuj )
+
+---
+
+いっぱいおっぱい遊んでね！
