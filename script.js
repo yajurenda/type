@@ -158,84 +158,103 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===================================
   // 9. 入力処理
   // ===================================
-  document.addEventListener("keydown", (e) => {
-    if (typingArea.classList.contains("hidden")) return;
-    const key = e.key.toLowerCase();
-    if (!/^[a-z]$/.test(key)) return;
+document.addEventListener("keydown", (e) => {
+  if (typingArea.classList.contains("hidden")) return;
+  const key = e.key.toLowerCase();
+  if (!/^[a-z]$/.test(key)) return;
 
-    const kanaSeq = toRomajiSequence(currentWord.reading);
-    if (kanaIndex >= kanaSeq.length) return;
+  const kanaSeq = toRomajiSequence(currentWord.reading);
+  if (kanaIndex >= kanaSeq.length) return;
 
-    let currentKana = currentWord.reading[kanaIndex];
-    let romajiOptions = kanaSeq[kanaIndex];
-    let matched = false;
+  let currentKana = currentWord.reading[kanaIndex];
+  let romajiOptions = kanaSeq[kanaIndex];
+  let matched = false;
 
-    // ==== 「ん」特別処理 ====
-    if (currentKana === "ん") {
-      const nextKana = currentWord.reading[kanaIndex + 1];
-      const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
-      const nextInitial = nextRomaji ? nextRomaji[0] : "";
-      if (key === "n") {
-        if ("aiueony".includes(nextInitial)) {
-          // 次が母音系 → nだけでは未確定
-          typedRomaji += key;
-          matched = true;
-        } else {
-          // 次が子音系 → nで確定
-          typedRomaji += key;
-          kanaIndex++;
-          matched = true;
-        }
+  // ===================================
+  // 「ん」専用処理（完全対応版）
+  // ===================================
+  if (currentKana === "ん") {
+    const nextKana = currentWord.reading[kanaIndex + 1];
+    const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
+    const nextInitial = nextRomaji ? nextRomaji[0] : "";
+
+    if (typedRomaji === "" && key === "n") {
+      // 「ん」入力開始
+      typedRomaji = "n";
+      matched = true;
+
+      // 次が母音・や行 → nだけでは未確定
+      if ("aiueony".includes(nextInitial)) {
+        // 待機状態にする
+        // （次のキーでnnが入力されたら確定）
+      } else {
+        // 次が子音系なら「ん」確定
+        kanaIndex++;
+        typedRomaji = "";
       }
-    }
-
-    // ==== 通常処理 ====
-    if (!matched) {
-      for (let opt of romajiOptions) {
-        if (opt.startsWith(typedRomaji + key)) {
-          typedRomaji += key;
-          matched = true;
-          if (typedRomaji === opt) {
-            kanaIndex++;
-            typedRomaji = "";
-          }
-          break;
-        }
-      }
-    }
-
-    // ==== 促音（っ） ====
-    if (!matched && currentKana === "っ") {
-      const nextKana = currentWord.reading[kanaIndex + 1];
-      if (nextKana) {
-        const nextOpt = kanaToRomaji[nextKana]?.[0];
-        if (nextOpt && key === nextOpt[0]) {
-          kanaIndex++;
-          matched = true;
-        }
-      }
-    }
-
-    // ==== 長音（ー） ====
-    if (!matched && currentKana === "ー") {
-      typedRomaji += key;
+    } else if (typedRomaji === "n" && key === "n") {
+      // 「nn」で確定（次が母音・や行）
       kanaIndex++;
+      typedRomaji = "";
       matched = true;
     }
+  }
 
-    // ==== 結果 ====
-    if (matched) {
-      updateDisplay();
-      if (kanaIndex >= kanaSeq.length) {
-        score++;
-        typedWords.push(currentWord.jp);
-        nextWord();
+  // ===================================
+  // 通常かな処理
+  // ===================================
+  if (!matched) {
+    for (let opt of romajiOptions) {
+      if (opt.startsWith(typedRomaji + key)) {
+        typedRomaji += key;
+        matched = true;
+        if (typedRomaji === opt) {
+          kanaIndex++;
+          typedRomaji = "";
+        }
+        break;
       }
-    } else {
-      romajiEl.classList.add("mistype");
-      setTimeout(() => romajiEl.classList.remove("mistype"), 150);
     }
-  });
+  }
+
+  // ===================================
+  // 促音「っ」
+  // ===================================
+  if (!matched && currentKana === "っ") {
+    const nextKana = currentWord.reading[kanaIndex + 1];
+    if (nextKana) {
+      const nextOpt = kanaToRomaji[nextKana]?.[0];
+      if (nextOpt && key === nextOpt[0]) {
+        kanaIndex++;
+        matched = true;
+      }
+    }
+  }
+
+  // ===================================
+  // 長音「ー」
+  // ===================================
+  if (!matched && currentKana === "ー") {
+    typedRomaji += key;
+    kanaIndex++;
+    matched = true;
+  }
+
+  // ===================================
+  // 結果反映
+  // ===================================
+  if (matched) {
+    updateDisplay();
+    if (kanaIndex >= kanaSeq.length) {
+      score++;
+      typedWords.push(currentWord.jp);
+      nextWord();
+    }
+  } else {
+    romajiEl.classList.add("mistype");
+    setTimeout(() => romajiEl.classList.remove("mistype"), 150);
+  }
+});
 
   // ===================================
   // 10. 終了
