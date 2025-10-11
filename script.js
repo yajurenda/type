@@ -192,58 +192,94 @@ function updateDisplay() {
     let romajiOptions = kanaSeq[kanaIndex];
     let matched = false;
 
-    // ==== 「ん」特別処理 ====
-    if (currentKana === "ん") {
-      const nextKana = currentWord.reading[kanaIndex + 1];
-      const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
-      const nextInitial = nextRomaji ? nextRomaji[0] : "";
-      if (key === "n") {
-        if ("aiueony".includes(nextInitial)) {
-          // 次が母音系 → nだけでは未確定
-          typedRomaji += key;
-          matched = true;
-        } else {
-          // 次が子音系 → nで確定
-          typedRomaji += key;
-          kanaIndex++;
-          matched = true;
-        }
-      }
-    }
+  // ===================================
+  // ✅ 改良版「ん」処理（重複防止）
+  // ===================================
+  if (currentKana === "ん") {
+    const nextKana = currentWord.reading[kanaIndex + 1];
+    const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
+    const nextInitial = nextRomaji ? nextRomaji[0] : "";
 
-    // ==== 通常処理 ====
-    if (!matched) {
-      for (let opt of romajiOptions) {
-        if (opt.startsWith(typedRomaji + key)) {
-          typedRomaji += key;
-          matched = true;
-          if (typedRomaji === opt) {
-            kanaIndex++;
-            typedRomaji = "";
-          }
-          break;
-        }
-      }
-    }
-
-    // ==== 促音（っ） ====
-    if (!matched && currentKana === "っ") {
-      const nextKana = currentWord.reading[kanaIndex + 1];
-      if (nextKana) {
-        const nextOpt = kanaToRomaji[nextKana]?.[0];
-        if (nextOpt && key === nextOpt[0]) {
-          kanaIndex++;
-          matched = true;
-        }
-      }
-    }
-
-    // ==== 長音（ー） ====
-    if (!matched && currentKana === "ー") {
-      typedRomaji += key;
-      kanaIndex++;
+    if (typedRomaji === "" && key === "n") {
+      typedRomaji = "n";
       matched = true;
+
+      // 次が母音・や行のときはnnが必要
+      if ("aiueony".includes(nextInitial)) {
+        // nn待ち
+      } else {
+        // 子音のときはn1回で確定
+        kanaIndex++;
+        typedRomaji = "";
+      }
+    } else if (typedRomaji === "n" && key === "n") {
+      // nnで確定（次が母音・や行）
+      kanaIndex++;
+      typedRomaji = "";
+      matched = true;
+    } else if (typedRomaji === "n" && key !== "n") {
+      // nのあとすぐ次の子音なら、んを確定して次に進む
+      kanaIndex++;
+      typedRomaji = "";
+      matched = false; // 次の仮名処理を継続
     }
+  }
+
+  // ===================================
+  // 通常のローマ字処理
+  // ===================================
+  if (!matched) {
+    const romajiSeq = kanaSeq[kanaIndex];
+    for (let opt of romajiSeq) {
+      if (opt.startsWith(typedRomaji + key)) {
+        typedRomaji += key;
+        matched = true;
+        if (typedRomaji === opt) {
+          kanaIndex++;
+          typedRomaji = "";
+        }
+        break;
+      }
+    }
+  }
+
+  // ===================================
+  // 促音「っ」
+  // ===================================
+  if (!matched && currentKana === "っ") {
+    const nextKana = currentWord.reading[kanaIndex + 1];
+    if (nextKana) {
+      const nextOpt = kanaToRomaji[nextKana]?.[0];
+      if (nextOpt && key === nextOpt[0]) {
+        kanaIndex++;
+        matched = true;
+      }
+    }
+  }
+
+  // ===================================
+  // 長音「ー」
+  // ===================================
+  if (!matched && currentKana === "ー") {
+    kanaIndex++;
+    matched = true;
+  }
+
+  // ===================================
+  // 表示更新
+  // ===================================
+  if (matched) {
+    updateDisplay();
+    if (kanaIndex >= kanaSeq.length) {
+      score++;
+      typedWords.push(currentWord.jp);
+      nextWord();
+    }
+  } else {
+    romajiEl.classList.add("mistype");
+    setTimeout(() => romajiEl.classList.remove("mistype"), 150);
+  }
+});
 
     // ==== 結果 ====
     if (matched) {
@@ -276,5 +312,18 @@ function updateDisplay() {
   startBtn.addEventListener("click", startGame);
   retryBtn.addEventListener("click", startGame);
 });
+
+
+document.addEventListener("keydown", (e) => {
+  if (typingArea.classList.contains("hidden")) return;
+  const key = e.key.toLowerCase();
+  if (!/^[a-z]$/.test(key)) return;
+
+  const kanaSeq = toRomajiSequence(currentWord.reading);
+  if (kanaIndex >= kanaSeq.length) return;
+
+  let currentKana = currentWord.reading[kanaIndex];
+  let romajiOptions = kanaSeq[kanaIndex];
+  let matched = false;
 
 
