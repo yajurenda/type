@@ -20,72 +20,71 @@ const words = [
   { jp: "ちんすこう", reading: "ちんすこう", romaji: "chinsukou" },
 ];
 
-let currentIndex = 0;
-let time = 45;
-let timerInterval;
-let score = 0;
-let typedWords = [];
+  let currentIndex = 0;
+  let time = 45;
+  let timerInterval;
+  let score = 0;
+  let typedWords = [];
 
-const startBtn = document.getElementById("start-btn");
-const retryBtn = document.getElementById("retry-btn");
-const startScreen = document.getElementById("start-screen");
-const typingArea = document.getElementById("typing-area");
-const resultScreen = document.getElementById("result-screen");
-const wordEl = document.getElementById("word");
-const readingEl = document.getElementById("reading");
-const romajiEl = document.getElementById("romaji");
-const timerEl = document.getElementById("timer");
-const scoreEl = document.getElementById("score");
-const wordListEl = document.getElementById("word-list");
+  const startBtn = document.getElementById("start-btn");
+  const retryBtn = document.getElementById("retry-btn");
+  const startScreen = document.getElementById("start-screen");
+  const typingArea = document.getElementById("typing-area");
+  const resultScreen = document.getElementById("result-screen");
+  const wordEl = document.getElementById("word");
+  const readingEl = document.getElementById("reading");
+  const romajiEl = document.getElementById("romaji");
+  const timerEl = document.getElementById("timer");
+  const scoreEl = document.getElementById("score");
+  const wordListEl = document.getElementById("word-list");
 
-function startGame() {
-  startScreen.classList.add("hidden");
-  resultScreen.classList.add("hidden");
-  typingArea.classList.remove("hidden");
-  score = 0;
-  typedWords = [];
-  time = 45;
-  timerEl.textContent = time;
-  nextWord();
-
-  timerInterval = setInterval(() => {
-    time--;
+  function startGame() {
+    startScreen.classList.add("hidden");
+    resultScreen.classList.add("hidden");
+    typingArea.classList.remove("hidden");
+    score = 0;
+    typedWords = [];
+    time = 45;
     timerEl.textContent = time;
-    if (time <= 0) {
-      endGame();
-    }
-  }, 1000);
-}
+    nextWord();
 
-function nextWord() {
-  const random = words[Math.floor(Math.random() * words.length)];
-  currentIndex = 0;
-  readingEl.textContent = random.reading;
-  wordEl.textContent = random.jp;
-  romajiEl.textContent = random.romaji;
-}
-
-document.addEventListener("keydown", (e) => {
-  if (typingArea.classList.contains("hidden")) return;
-
-  const currentWord = romajiEl.textContent;
-  if (e.key === currentWord[currentIndex]) {
-    currentIndex++;
-    if (currentIndex === currentWord.length) {
-      score++;
-      typedWords.push(wordEl.textContent);
-      nextWord();
-    }
+    timerInterval = setInterval(() => {
+      time--;
+      timerEl.textContent = time;
+      if (time <= 0) endGame();
+    }, 1000);
   }
+
+  function nextWord() {
+    const random = words[Math.floor(Math.random() * words.length)];
+    currentIndex = 0;
+    readingEl.textContent = random.reading;
+    wordEl.textContent = random.jp;
+    romajiEl.textContent = random.romaji;
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (typingArea.classList.contains("hidden")) return;
+
+    const currentWord = romajiEl.textContent;
+    if (e.key === currentWord[currentIndex]) {
+      currentIndex++;
+      if (currentIndex === currentWord.length) {
+        score++;
+        typedWords.push(wordEl.textContent);
+        nextWord();
+      }
+    }
+  });
+
+  function endGame() {
+    clearInterval(timerInterval);
+    typingArea.classList.add("hidden");
+    resultScreen.classList.remove("hidden");
+    scoreEl.textContent = score;
+    wordListEl.innerHTML = typedWords.map(w => `<li>${w}</li>`).join("");
+  }
+
+  startBtn.addEventListener("click", startGame);
+  retryBtn.addEventListener("click", startGame);
 });
-
-function endGame() {
-  clearInterval(timerInterval);
-  typingArea.classList.add("hidden");
-  resultScreen.classList.remove("hidden");
-  scoreEl.textContent = score;
-  wordListEl.innerHTML = typedWords.map(w => `<li>${w}</li>`).join("");
-}
-
-startBtn.addEventListener("click", startGame);
-retryBtn.addEventListener("click", startGame);
