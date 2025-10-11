@@ -4,6 +4,10 @@
 # あそぶ
 https://tdkrtype.vercel.app
 
+# ちゅうい
+1.バグあるかも
+2.単語がまだ少ないから被る
+
 # しゅうろく
 このタイピングで出てくる単語一覧です。
 >単語募集もやっています。良かったら送ってください。https://forms.gle/TNsq6fr1ZCViSph1A
