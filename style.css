@@ -61,3 +61,29 @@ button:hover {
   list-style: none;
   padding: 0;
 }
+
+/* 進行バー */
+#progress-bar {
+  height: 8px;
+  background-color: limegreen;
+  width: 100%;
+  transition: width 1s linear;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+/* ミスタイプ時の点滅 */
+.mistype {
+  animation: blink-red 0.2s ease;
+}
+
+@keyframes blink-red {
+  0% { color: red; }
+  100% { color: black; }
+}
+
+/* 打った文字の色 */
+#romaji .typed {
+  color: limegreen;
+  font-weight: bold;
+}
