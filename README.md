@@ -12,6 +12,9 @@ https://tdkrtype.vercel.app
 >単語募集もやっています。
 >良かったら送ってください。https://forms.gle/TNsq6fr1ZCViSph1A
 
+<details>
+<summary>収録単語</summary>
+
 フェラーリ
 写生大会
 お賃金
@@ -31,3 +34,4 @@ https://tdkrtype.vercel.app
 鎮火
 満州
 ちんすこう
+</details>
