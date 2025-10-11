@@ -1,29 +1,51 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // ===================================
+  // 1. 仮名 → ローマ字マップ（完全対応）
+  // ===================================
   const kanaToRomaji = {
-    あ: ["a"], い: ["i"], う: ["u"], え: ["e"], お: ["o"],
-    か: ["ka"], き: ["ki"], く: ["ku"], け: ["ke"], こ: ["ko"],
-    さ: ["sa"], し: ["shi", "si", "ci"], す: ["su"], せ: ["se"], そ: ["so"],
-    た: ["ta"], ち: ["chi", "ti"], つ: ["tsu", "tu"], て: ["te"], と: ["to"],
-    な: ["na"], に: ["ni"], ぬ: ["nu"], ね: ["ne"], の: ["no"],
-    は: ["ha"], ひ: ["hi"], ふ: ["fu", "hu"], へ: ["he"], ほ: ["ho"],
-    ま: ["ma"], み: ["mi"], む: ["mu"], め: ["me"], も: ["mo"],
-    や: ["ya"], ゆ: ["yu"], よ: ["yo"],
-    ら: ["ra"], り: ["ri"], る: ["ru"], れ: ["re"], ろ: ["ro"],
-    わ: ["wa"], を: ["wo"], ん: ["n", "nn"],
-    が: ["ga"], ぎ: ["gi"], ぐ: ["gu"], げ: ["ge"], ご: ["go"],
-    ざ: ["za"], じ: ["ji", "zi"], ず: ["zu"], ぜ: ["ze"], ぞ: ["zo"],
-    だ: ["da"], ぢ: ["ji", "di"], づ: ["zu", "du"], で: ["de"], ど: ["do"],
-    ば: ["ba"], び: ["bi"], ぶ: ["bu"], べ: ["be"], ぼ: ["bo"],
-    ぱ: ["pa"], ぴ: ["pi"], ぷ: ["pu"], ぺ: ["pe"], ぽ: ["po"],
-    きゃ: ["kya"], きゅ: ["kyu"], きょ: ["kyo"],
-    しゃ: ["sha", "sya"], しゅ: ["shu", "syu"], しょ: ["sho", "syo"],
-    ちゃ: ["cha", "cya", "tya"], ちゅ: ["chu", "cyu", "tyu"], ちょ: ["cho", "cyo", "tyo"],
-    にゃ: ["nya"], にゅ: ["nyu"], にょ: ["nyo"],
-    ひゃ: ["hya"], ひゅ: ["hyu"], ひょ: ["hyo"],
-    みゃ: ["mya"], みゅ: ["myu"], みょ: ["myo"],
-    りゃ: ["rya"], りゅ: ["ryu"], りょ: ["ryo"],
+    // 単母音
+    あ:["a"],い:["i"],う:["u"],え:["e"],お:["o"],
+    // 子音行
+    か:["ka"],き:["ki"],く:["ku"],け:["ke"],こ:["ko"],
+    さ:["sa"],し:["shi","si","ci"],す:["su"],せ:["se"],そ:["so"],
+    た:["ta"],ち:["chi","ti"],つ:["tsu","tu"],て:["te"],と:["to"],
+    な:["na"],に:["ni"],ぬ:["nu"],ね:["ne"],の:["no"],
+    は:["ha"],ひ:["hi"],ふ:["fu","hu"],へ:["he"],ほ:["ho"],
+    ま:["ma"],み:["mi"],む:["mu"],め:["me"],も:["mo"],
+    や:["ya"],ゆ:["yu"],よ:["yo"],
+    ら:["ra"],り:["ri"],る:["ru"],れ:["re"],ろ:["ro"],
+    わ:["wa"],を:["wo"],ん:["n","nn"],
+    // 濁音・半濁音
+    が:["ga"],ぎ:["gi"],ぐ:["gu"],げ:["ge"],ご:["go"],
+    ざ:["za"],じ:["ji","zi"],ず:["zu"],ぜ:["ze"],ぞ:["zo"],
+    だ:["da"],ぢ:["ji","di"],づ:["zu","du"],で:["de"],ど:["do"],
+    ば:["ba"],び:["bi"],ぶ:["bu"],べ:["be"],ぼ:["bo"],
+    ぱ:["pa"],ぴ:["pi"],ぷ:["pu"],ぺ:["pe"],ぽ:["po"],
+    // 拗音
+    きゃ:["kya"],きゅ:["kyu"],きょ:["kyo"],
+    しゃ:["sha","sya"],しゅ:["shu","syu"],しょ:["sho","syo"],
+    ちゃ:["cha","tya","cya"],ちゅ:["chu","tyu","cyu"],ちょ:["cho","tyo","cyo"],
+    にゃ:["nya"],にゅ:["nyu"],にょ:["nyo"],
+    ひゃ:["hya"],ひゅ:["hyu"],ひょ:["hyo"],
+    みゃ:["mya"],みゅ:["myu"],みょ:["myo"],
+    りゃ:["rya"],りゅ:["ryu"],りょ:["ryo"],
+    ぎゃ:["gya"],ぎゅ:["gyu"],ぎょ:["gyo"],
+    じゃ:["ja","jya","zya"],じゅ:["ju","jyu","zyu"],じょ:["jo","jyo","zyo"],
+    びゃ:["bya"],びゅ:["byu"],びょ:["byo"],
+    ぴゃ:["pya"],ぴゅ:["pyu"],ぴょ:["pyo"],
+    // 外来語・特殊音
+    ふぁ:["fa"],ふぃ:["fi"],ふぇ:["fe"],ふぉ:["fo"],
+    てぃ:["ti"],でぃ:["di"],どぅ:["du"],
+    うぃ:["wi"],うぇ:["we"],うぉ:["wo"],
+    ヴぁ:["va"],ヴぃ:["vi"],ヴ:["vu"],ヴぇ:["ve"],ヴぉ:["vo"],
+    // 小文字系
+    ぁ:["xa","la"],ぃ:["xi","li"],ぅ:["xu","lu"],ぇ:["xe","le"],ぉ:["xo","lo"],
+    ゃ:["xya","lya"],ゅ:["xyu","lyu"],ょ:["xyo","lyo"],っ:["xtu","ltu","xtsu","ltsu"],
   };
 
+  // ===================================
+  // 2. 単語データ
+  // ===================================
   const words = [
     { jp: "フェラーリ", reading: "ふぇらーり" },
     { jp: "写生大会", reading: "しゃせいたいかい" },
@@ -46,16 +68,21 @@ document.addEventListener("DOMContentLoaded", () => {
     { jp: "ちんすこう", reading: "ちんすこう" },
   ];
 
-  // --- ゲーム状態 ---
+  // ===================================
+  // 3. 状態変数
+  // ===================================
   let currentWord = {};
   let kanaIndex = 0;
-  let romajiProgress = "";
+  let currentRomaji = "";
+  let typed = "";
   let time = 45;
-  let timerInterval;
+  let timer;
   let score = 0;
-  let typedWords = [];
+  let typedList = [];
 
-  // --- 要素 ---
+  // ===================================
+  // 4. 要素取得
+  // ===================================
   const startBtn = document.getElementById("start-btn");
   const retryBtn = document.getElementById("retry-btn");
   const startScreen = document.getElementById("start-screen");
@@ -65,45 +92,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const readingEl = document.getElementById("reading");
   const romajiEl = document.getElementById("romaji");
   const timerEl = document.getElementById("timer");
+  const scoreEl = document.getElementById("score");
+  const wordListEl = document.getElementById("word-list");
   const progressBar = document.createElement("div");
   progressBar.id = "progress-bar";
   typingArea.prepend(progressBar);
-  const scoreEl = document.getElementById("score");
-  const wordListEl = document.getElementById("word-list");
 
-  // --- ユーティリティ ---
-  function hiraToRomaji(kana) {
-    let result = [];
+  // ===================================
+  // 5. 仮名をローマ字列へ展開
+  // ===================================
+  function kanaToRomajiSequence(kana) {
+    const result = [];
     let i = 0;
     while (i < kana.length) {
-      // 拗音（きゃ、しゃなど）を優先
-      const pair = kana.substring(i, i + 2);
-      if (kanaToRomaji[pair]) {
-        result.push(kanaToRomaji[pair]);
+      let next2 = kana.slice(i, i + 2);
+      if (kanaToRomaji[next2]) {
+        result.push(kanaToRomaji[next2]);
         i += 2;
       } else if (kanaToRomaji[kana[i]]) {
         result.push(kanaToRomaji[kana[i]]);
         i++;
-      } else {
-        i++;
-      }
+      } else i++;
     }
     return result;
   }
 
-  // --- ゲーム開始 ---
+  // ===================================
+  // 6. ゲーム制御
+  // ===================================
   function startGame() {
     startScreen.classList.add("hidden");
     resultScreen.classList.add("hidden");
     typingArea.classList.remove("hidden");
     score = 0;
-    typedWords = [];
+    typedList = [];
     time = 45;
     timerEl.textContent = time;
     progressBar.style.width = "100%";
     nextWord();
-
-    timerInterval = setInterval(() => {
+    timer = setInterval(() => {
       time--;
       timerEl.textContent = time;
       progressBar.style.width = `${(time / 45) * 100}%`;
@@ -114,46 +141,62 @@ document.addEventListener("DOMContentLoaded", () => {
   function nextWord() {
     currentWord = words[Math.floor(Math.random() * words.length)];
     kanaIndex = 0;
-    romajiProgress = "";
+    currentRomaji = "";
+    typed = "";
     readingEl.textContent = currentWord.reading;
     wordEl.textContent = currentWord.jp;
-    updateRomajiDisplay();
+    updateDisplay();
   }
 
-  // --- 表示更新 ---
-  function updateRomajiDisplay() {
-    romajiEl.innerHTML = `<span class="typed">${romajiProgress}</span>`;
+  function endGame() {
+    clearInterval(timer);
+    typingArea.classList.add("hidden");
+    resultScreen.classList.remove("hidden");
+    scoreEl.textContent = score;
+    wordListEl.innerHTML = typedList.map(w => `<li>${w}</li>`).join("");
   }
 
-  // --- タイピング処理 ---
+  // ===================================
+  // 7. 表示更新
+  // ===================================
+  function updateDisplay() {
+    romajiEl.innerHTML = `<span class="typed">${typed}</span>${currentRomaji.slice(typed.length)}`;
+  }
+
+  // ===================================
+  // 8. 入力処理
+  // ===================================
   document.addEventListener("keydown", (e) => {
     if (typingArea.classList.contains("hidden")) return;
     const key = e.key.toLowerCase();
-    if (!/^[a-z]$/.test(key)) return; // 英字のみ
+    if (!/^[a-z]$/.test(key)) return;
 
-    const kanaArray = hiraToRomaji(currentWord.reading);
+    const kanaArray = kanaToRomajiSequence(currentWord.reading);
     if (kanaIndex >= kanaArray.length) return;
 
-    const currentKanaOptions = kanaArray[kanaIndex];
+    let options = kanaArray[kanaIndex];
+    let progress = typed.slice(typed.lastIndexOf(" ") + 1);
     let matched = false;
 
-    for (let opt of currentKanaOptions) {
-      if (opt.startsWith(romajiProgress.slice(-opt.length + 1) + key) || opt.startsWith(romajiProgress.slice(-opt.length + 2) + key)) {
-        romajiProgress += key;
+    // 促音処理（っ）
+    if (currentWord.reading[kanaIndex] === "っ" && kanaArray[kanaIndex + 1]) {
+      const nextOptions = kanaArray[kanaIndex + 1];
+      for (let o of nextOptions) {
+        if (key === o[0]) {
+          kanaIndex++;
+          matched = true;
+          break;
+        }
+      }
+    }
+
+    for (let o of options) {
+      if ((progress + key) === o.slice(0, progress.length + 1)) {
+        typed += key;
         matched = true;
 
-        // 完了チェック
-        if (romajiProgress.endsWith(opt)) {
-          kanaIndex++;
-        }
-        updateRomajiDisplay();
-
-        // 全部終わった？
-        if (kanaIndex >= kanaArray.length) {
-          score++;
-          typedWords.push(currentWord.jp);
-          nextWord();
-        }
+        // その音が完了したら次へ
+        if (typed.endsWith(o)) kanaIndex++;
         break;
       }
     }
@@ -161,18 +204,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!matched) {
       romajiEl.classList.add("mistype");
       setTimeout(() => romajiEl.classList.remove("mistype"), 150);
+    } else {
+      updateDisplay();
+      if (kanaIndex >= kanaArray.length) {
+        score++;
+        typedList.push(currentWord.jp);
+        nextWord();
+      }
     }
   });
 
-  // --- ゲーム終了 ---
-  function endGame() {
-    clearInterval(timerInterval);
-    typingArea.classList.add("hidden");
-    resultScreen.classList.remove("hidden");
-    scoreEl.textContent = score;
-    wordListEl.innerHTML = typedWords.map(w => `<li>${w}</li>`).join("");
-  }
-
+  // ===================================
+  // 9. ボタン
+  // ===================================
   startBtn.addEventListener("click", startGame);
   retryBtn.addEventListener("click", startGame);
 });
