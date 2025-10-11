@@ -32,5 +32,8 @@ https://tdkrtype.vercel.app
 ちんすこう
 </details>
 
+# こーど
+
+
 # つくったひと
 田所工事中 ( https://bento.me/tdkrkuj )
