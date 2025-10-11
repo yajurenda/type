@@ -1,30 +1,32 @@
-const words = [
-  { jp: "フェラーリ", reading: "ふぇらーり", romaji: "ferari" },
-  { jp: "写生大会", reading: "しゃせいたいかい", romaji: "shaseitaikai" },
-  { jp: "お賃金", reading: "おちんぎん", romaji: "ochingin" },
-  { jp: "漫湖", reading: "まんこ", romaji: "manko" },
-  { jp: "アナリスト", reading: "あなりすと", romaji: "anaristo" },
-  { jp: "万華鏡", reading: "まんげきょう", romaji: "mangekyou" },
-  { jp: "オスマン帝国", reading: "おすまんていこく", romaji: "osumanteikoku" },
-  { jp: "一万個", reading: "いちまんこ", romaji: "ichimanko" },
-  { jp: "π", reading: "ぱい", romaji: "pai" },
-  { jp: "マンホール", reading: "まんほーる", romaji: "manhoru" },
-  { jp: "満月", reading: "まんげつ", romaji: "mangetsu" },
-  { jp: "ちんちん電車", reading: "ちんちんでんしゃ", romaji: "chinchindensha" },
-  { jp: "不正行為", reading: "ふせいこうい", romaji: "fuseikoui" },
-  { jp: "節句", reading: "せっく", romaji: "sekku" },
-  { jp: "デンマーク", reading: "でんまーく", romaji: "denmaaku" },
-  { jp: "手抜き", reading: "てぬき", romaji: "tenuki" },
-  { jp: "鎮火", reading: "ちんか", romaji: "chinka" },
-  { jp: "満州", reading: "まんしゅう", romaji: "manshuu" },
-  { jp: "ちんすこう", reading: "ちんすこう", romaji: "chinsukou" },
-];
+document.addEventListener("DOMContentLoaded", () => {
+  const words = [
+    { jp: "フェラーリ", reading: "ふぇらーり", romaji: "ferari" },
+    { jp: "写生大会", reading: "しゃせいたいかい", romaji: "shaseitaikai" },
+    { jp: "お賃金", reading: "おちんぎん", romaji: "ochingin" },
+    { jp: "漫湖", reading: "まんこ", romaji: "manko" },
+    { jp: "アナリスト", reading: "あなりすと", romaji: "anaristo" },
+    { jp: "万華鏡", reading: "まんげきょう", romaji: "mangekyou" },
+    { jp: "オスマン帝国", reading: "おすまんていこく", romaji: "osumanteikoku" },
+    { jp: "一万個", reading: "いちまんこ", romaji: "ichimanko" },
+    { jp: "π", reading: "ぱい", romaji: "pai" },
+    { jp: "マンホール", reading: "まんほーる", romaji: "manhoru" },
+    { jp: "満月", reading: "まんげつ", romaji: "mangetsu" },
+    { jp: "ちんちん電車", reading: "ちんちんでんしゃ", romaji: "chinchindensha" },
+    { jp: "不正行為", reading: "ふせいこうい", romaji: "fuseikoui" },
+    { jp: "節句", reading: "せっく", romaji: "sekku" },
+    { jp: "デンマーク", reading: "でんまーく", romaji: "denmaaku" },
+    { jp: "手抜き", reading: "てぬき", romaji: "tenuki" },
+    { jp: "鎮火", reading: "ちんか", romaji: "chinka" },
+    { jp: "満州", reading: "まんしゅう", romaji: "manshuu" },
+    { jp: "ちんすこう", reading: "ちんすこう", romaji: "chinsukou" },
+  ];
 
   let currentIndex = 0;
   let time = 45;
   let timerInterval;
   let score = 0;
   let typedWords = [];
+  let currentWord = {};
 
   const startBtn = document.getElementById("start-btn");
   const retryBtn = document.getElementById("retry-btn");
@@ -56,22 +58,32 @@ const words = [
   }
 
   function nextWord() {
-    const random = words[Math.floor(Math.random() * words.length)];
+    currentWord = words[Math.floor(Math.random() * words.length)];
     currentIndex = 0;
-    readingEl.textContent = random.reading;
-    wordEl.textContent = random.jp;
-    romajiEl.textContent = random.romaji;
+    readingEl.textContent = currentWord.reading;
+    wordEl.textContent = currentWord.jp;
+    updateRomajiDisplay();
+  }
+
+  function updateRomajiDisplay() {
+    const typed = currentWord.romaji.slice(0, currentIndex);
+    const remaining = currentWord.romaji.slice(currentIndex);
+    romajiEl.innerHTML = `<span style="color: limegreen;">${typed}</span>${remaining}`;
   }
 
   document.addEventListener("keydown", (e) => {
     if (typingArea.classList.contains("hidden")) return;
 
-    const currentWord = romajiEl.textContent;
-    if (e.key === currentWord[currentIndex]) {
+    const romaji = currentWord.romaji;
+    const key = e.key.toLowerCase();
+
+    if (key === romaji[currentIndex]) {
       currentIndex++;
-      if (currentIndex === currentWord.length) {
+      updateRomajiDisplay();
+
+      if (currentIndex === romaji.length) {
         score++;
-        typedWords.push(wordEl.textContent);
+        typedWords.push(currentWord.jp);
         nextWord();
       }
     }
