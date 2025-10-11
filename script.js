@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-
-
   // ===================================
   // 1. 仮名 → ローマ字マップ（完全対応）
   // ===================================
@@ -32,12 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
     じゃ:["ja","jya","zya"],じゅ:["ju","jyu","zyu"],じょ:["jo","jyo","zyo"],
     びゃ:["bya"],びゅ:["byu"],びょ:["byo"],
     ぴゃ:["pya"],ぴゅ:["pyu"],ぴょ:["pyo"],
-    // 外来語・特殊音
     ふぁ:["fa"],ふぃ:["fi"],ふぇ:["fe"],ふぉ:["fo"],
     てぃ:["ti"],でぃ:["di"],どぅ:["du"],
     うぃ:["wi"],うぇ:["we"],うぉ:["wo"],
     ヴぁ:["va"],ヴぃ:["vi"],ヴ:["vu"],ヴぇ:["ve"],ヴぉ:["vo"],
-    // 小文字
     ぁ:["xa","la"],ぃ:["xi","li"],ぅ:["xu","lu"],ぇ:["xe","le"],ぉ:["xo","lo"],
     ゃ:["xya","lya"],ゅ:["xyu","lyu"],ょ:["xyo","lyo"],
     っ:["xtu","ltu","xtsu","ltsu"]
@@ -93,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const timerEl = document.getElementById("timer");
   const scoreEl = document.getElementById("score");
   const wordListEl = document.getElementById("word-list");
+
   const progressBar = document.createElement("div");
   progressBar.id = "progress-bar";
   typingArea.prepend(progressBar);
@@ -116,8 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return result;
   }
 
-
-
   // ===================================
   // 6. ゲーム開始
   // ===================================
@@ -125,11 +120,13 @@ document.addEventListener("DOMContentLoaded", () => {
     startScreen.classList.add("hidden");
     resultScreen.classList.add("hidden");
     typingArea.classList.remove("hidden");
+
     score = 0;
     typedWords = [];
     time = 45;
     timerEl.textContent = time;
     progressBar.style.width = "100%";
+
     nextWord();
 
     timer = setInterval(() => {
@@ -155,27 +152,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===================================
   // 8. 表示更新
   // ===================================
-function updateDisplay() {
-  // 全かなのローマ字列を展開（1単語分）
-  const romajiSeq = toRomajiSequence(currentWord.reading).flat();
+  function updateDisplay() {
+    const romajiSeq = toRomajiSequence(currentWord.reading).flat();
+    let fullRomaji = romajiSeq.join("");
+    let progressRomaji = "";
+    for (let i = 0; i < kanaIndex; i++) {
+      progressRomaji += romajiSeq[i];
+    }
+    progressRomaji += typedRomaji;
 
-  // 各かなまでのローマ字を結合して、全文を作る
-  let fullRomaji = romajiSeq.join("");
-
-  // 現在までに打ったローマ字を組み合わせて、どこまで進んだか判定
-  let progressRomaji = "";
-  let tmpIndex = kanaIndex;
-  for (let i = 0; i < tmpIndex; i++) {
-    progressRomaji += romajiSeq[i];
+    romajiEl.innerHTML = `
+      <span class="typed">${progressRomaji}</span>
+      <span class="remaining">${fullRomaji.slice(progressRomaji.length)}</span>
+    `;
   }
-  progressRomaji += typedRomaji; // 途中まで入力している分
-
-  // 表示構築
-  romajiEl.innerHTML = `
-    <span class="typed">${progressRomaji}</span>
-    <span class="remaining">${fullRomaji.slice(progressRomaji.length)}</span>
-  `;
-}
 
   // ===================================
   // 9. 入力処理
@@ -192,96 +182,63 @@ function updateDisplay() {
     let romajiOptions = kanaSeq[kanaIndex];
     let matched = false;
 
-  // ===================================
-  // ✅ 改良版「ん」処理（重複防止）
-  // ===================================
-  if (currentKana === "ん") {
-    const nextKana = currentWord.reading[kanaIndex + 1];
-    const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
-    const nextInitial = nextRomaji ? nextRomaji[0] : "";
+    // 「ん」処理
+    if (currentKana === "ん") {
+      const nextKana = currentWord.reading[kanaIndex + 1];
+      const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
+      const nextInitial = nextRomaji ? nextRomaji[0] : "";
 
-    if (typedRomaji === "" && key === "n") {
-      typedRomaji = "n";
-      matched = true;
-
-      // 次が母音・や行のときはnnが必要
-      if ("aiueony".includes(nextInitial)) {
-        // nn待ち
-      } else {
-        // 子音のときはn1回で確定
-        kanaIndex++;
-        typedRomaji = "";
-      }
-    } else if (typedRomaji === "n" && key === "n") {
-      // nnで確定（次が母音・や行）
-      kanaIndex++;
-      typedRomaji = "";
-      matched = true;
-    } else if (typedRomaji === "n" && key !== "n") {
-      // nのあとすぐ次の子音なら、んを確定して次に進む
-      kanaIndex++;
-      typedRomaji = "";
-      matched = false; // 次の仮名処理を継続
-    }
-  }
-
-  // ===================================
-  // 通常のローマ字処理
-  // ===================================
-  if (!matched) {
-    const romajiSeq = kanaSeq[kanaIndex];
-    for (let opt of romajiSeq) {
-      if (opt.startsWith(typedRomaji + key)) {
-        typedRomaji += key;
+      if (typedRomaji === "" && key === "n") {
+        typedRomaji = "n";
         matched = true;
-        if (typedRomaji === opt) {
+        if (!"aiueony".includes(nextInitial)) {
           kanaIndex++;
           typedRomaji = "";
         }
-        break;
-      }
-    }
-  }
-
-  // ===================================
-  // 促音「っ」
-  // ===================================
-  if (!matched && currentKana === "っ") {
-    const nextKana = currentWord.reading[kanaIndex + 1];
-    if (nextKana) {
-      const nextOpt = kanaToRomaji[nextKana]?.[0];
-      if (nextOpt && key === nextOpt[0]) {
+      } else if (typedRomaji === "n" && key === "n") {
         kanaIndex++;
+        typedRomaji = "";
         matched = true;
+      } else if (typedRomaji === "n" && key !== "n") {
+        kanaIndex++;
+        typedRomaji = "";
+        matched = false;
       }
     }
-  }
 
-  // ===================================
-  // 長音「ー」
-  // ===================================
-  if (!matched && currentKana === "ー") {
-    kanaIndex++;
-    matched = true;
-  }
-
-  // ===================================
-  // 表示更新
-  // ===================================
-  if (matched) {
-    updateDisplay();
-    if (kanaIndex >= kanaSeq.length) {
-      score++;
-      typedWords.push(currentWord.jp);
-      nextWord();
+    // 通常処理
+    if (!matched) {
+      for (let opt of romajiOptions) {
+        if (opt.startsWith(typedRomaji + key)) {
+          typedRomaji += key;
+          matched = true;
+          if (typedRomaji === opt) {
+            kanaIndex++;
+            typedRomaji = "";
+          }
+          break;
+        }
+      }
     }
-  } else {
-    romajiEl.classList.add("mistype");
-    setTimeout(() => romajiEl.classList.remove("mistype"), 150);
-  }
-});
 
-    // ==== 結果 ====
+    // 促音「っ」
+    if (!matched && currentKana === "っ") {
+      const nextKana = currentWord.reading[kanaIndex + 1];
+      if (nextKana) {
+        const nextOpt = kanaToRomaji[nextKana]?.[0];
+        if (nextOpt && key === nextOpt[0]) {
+          kanaIndex++;
+          matched = true;
+        }
+      }
+    }
+
+    // 長音「ー」
+    if (!matched && currentKana === "ー") {
+      kanaIndex++;
+      matched = true;
+    }
+
     if (matched) {
       updateDisplay();
       if (kanaIndex >= kanaSeq.length) {
@@ -296,7 +253,7 @@ function updateDisplay() {
   });
 
   // ===================================
-  // 10. 終了
+  // 10. ゲーム終了
   // ===================================
   function endGame() {
     clearInterval(timer);
@@ -311,19 +268,5 @@ function updateDisplay() {
   // ===================================
   startBtn.addEventListener("click", startGame);
   retryBtn.addEventListener("click", startGame);
+
 });
-
-
-document.addEventListener("keydown", (e) => {
-  if (typingArea.classList.contains("hidden")) return;
-  const key = e.key.toLowerCase();
-  if (!/^[a-z]$/.test(key)) return;
-
-  const kanaSeq = toRomajiSequence(currentWord.reading);
-  if (kanaIndex >= kanaSeq.length) return;
-
-  let currentKana = currentWord.reading[kanaIndex];
-  let romajiOptions = kanaSeq[kanaIndex];
-  let matched = false;
-
-
