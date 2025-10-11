@@ -10,7 +10,7 @@ https://tdkrtype.vercel.app
 
 <details>
 <summary>収録単語</summary>
-
+  
 フェラーリ
 写生大会
 お賃金
