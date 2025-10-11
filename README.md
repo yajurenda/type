@@ -1,9 +1,11 @@
-# about
+# これはなんすか
 田所工事中が作成した __超健全なタイピングゲーム__ 。
 
-# play
+# プレイリンク教えろボケ殺すぞ
 https://tdkrtype.vercel.app
 
-# info
-作者:
-田所工事中( https://bento.me/tdkrkuj )
+# つくったひと
+田所工事中 ( https://bento.me/tdkrkuj )
+
+# れんらく
+yajurendainfo@gmail.com
