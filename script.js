@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+
+
   // ===================================
   // 1. 仮名 → ローマ字マップ（完全対応）
   // ===================================
@@ -113,6 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return result;
   }
 
+
+
   // ===================================
   // 6. ゲーム開始
   // ===================================
@@ -150,111 +155,109 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===================================
   // 8. 表示更新
   // ===================================
-  function updateDisplay() {
-    const romajiSeq = toRomajiSequence(currentWord.reading).flat()[kanaIndex] || "";
-    romajiEl.innerHTML = `<span class="typed">${typedRomaji}</span>${romajiSeq.slice(typedRomaji.length)}`;
+function updateDisplay() {
+  // 全かなのローマ字列を展開（1単語分）
+  const romajiSeq = toRomajiSequence(currentWord.reading).flat();
+
+  // 各かなまでのローマ字を結合して、全文を作る
+  let fullRomaji = romajiSeq.join("");
+
+  // 現在までに打ったローマ字を組み合わせて、どこまで進んだか判定
+  let progressRomaji = "";
+  let tmpIndex = kanaIndex;
+  for (let i = 0; i < tmpIndex; i++) {
+    progressRomaji += romajiSeq[i];
   }
+  progressRomaji += typedRomaji; // 途中まで入力している分
+
+  // 表示構築
+  romajiEl.innerHTML = `
+    <span class="typed">${progressRomaji}</span>
+    <span class="remaining">${fullRomaji.slice(progressRomaji.length)}</span>
+  `;
+}
 
   // ===================================
   // 9. 入力処理
   // ===================================
-document.addEventListener("keydown", (e) => {
-  if (typingArea.classList.contains("hidden")) return;
-  const key = e.key.toLowerCase();
-  if (!/^[a-z]$/.test(key)) return;
+  document.addEventListener("keydown", (e) => {
+    if (typingArea.classList.contains("hidden")) return;
+    const key = e.key.toLowerCase();
+    if (!/^[a-z]$/.test(key)) return;
 
-  const kanaSeq = toRomajiSequence(currentWord.reading);
-  if (kanaIndex >= kanaSeq.length) return;
+    const kanaSeq = toRomajiSequence(currentWord.reading);
+    if (kanaIndex >= kanaSeq.length) return;
 
-  let currentKana = currentWord.reading[kanaIndex];
-  let romajiOptions = kanaSeq[kanaIndex];
-  let matched = false;
+    let currentKana = currentWord.reading[kanaIndex];
+    let romajiOptions = kanaSeq[kanaIndex];
+    let matched = false;
 
-  // ===================================
-  // 「ん」専用処理（完全対応版）
-  // ===================================
-  if (currentKana === "ん") {
-    const nextKana = currentWord.reading[kanaIndex + 1];
-    const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
-    const nextInitial = nextRomaji ? nextRomaji[0] : "";
-
-    if (typedRomaji === "" && key === "n") {
-      // 「ん」入力開始
-      typedRomaji = "n";
-      matched = true;
-
-      // 次が母音・や行 → nだけでは未確定
-      if ("aiueony".includes(nextInitial)) {
-        // 待機状態にする
-        // （次のキーでnnが入力されたら確定）
-      } else {
-        // 次が子音系なら「ん」確定
-        kanaIndex++;
-        typedRomaji = "";
-      }
-    } else if (typedRomaji === "n" && key === "n") {
-      // 「nn」で確定（次が母音・や行）
-      kanaIndex++;
-      typedRomaji = "";
-      matched = true;
-    }
-  }
-
-  // ===================================
-  // 通常かな処理
-  // ===================================
-  if (!matched) {
-    for (let opt of romajiOptions) {
-      if (opt.startsWith(typedRomaji + key)) {
-        typedRomaji += key;
-        matched = true;
-        if (typedRomaji === opt) {
+    // ==== 「ん」特別処理 ====
+    if (currentKana === "ん") {
+      const nextKana = currentWord.reading[kanaIndex + 1];
+      const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
+      const nextInitial = nextRomaji ? nextRomaji[0] : "";
+      if (key === "n") {
+        if ("aiueony".includes(nextInitial)) {
+          // 次が母音系 → nだけでは未確定
+          typedRomaji += key;
+          matched = true;
+        } else {
+          // 次が子音系 → nで確定
+          typedRomaji += key;
           kanaIndex++;
-          typedRomaji = "";
+          matched = true;
         }
-        break;
       }
     }
-  }
 
-  // ===================================
-  // 促音「っ」
-  // ===================================
-  if (!matched && currentKana === "っ") {
-    const nextKana = currentWord.reading[kanaIndex + 1];
-    if (nextKana) {
-      const nextOpt = kanaToRomaji[nextKana]?.[0];
-      if (nextOpt && key === nextOpt[0]) {
-        kanaIndex++;
-        matched = true;
+    // ==== 通常処理 ====
+    if (!matched) {
+      for (let opt of romajiOptions) {
+        if (opt.startsWith(typedRomaji + key)) {
+          typedRomaji += key;
+          matched = true;
+          if (typedRomaji === opt) {
+            kanaIndex++;
+            typedRomaji = "";
+          }
+          break;
+        }
       }
     }
-  }
 
-  // ===================================
-  // 長音「ー」
-  // ===================================
-  if (!matched && currentKana === "ー") {
-    typedRomaji += key;
-    kanaIndex++;
-    matched = true;
-  }
-
-  // ===================================
-  // 結果反映
-  // ===================================
-  if (matched) {
-    updateDisplay();
-    if (kanaIndex >= kanaSeq.length) {
-      score++;
-      typedWords.push(currentWord.jp);
-      nextWord();
+    // ==== 促音（っ） ====
+    if (!matched && currentKana === "っ") {
+      const nextKana = currentWord.reading[kanaIndex + 1];
+      if (nextKana) {
+        const nextOpt = kanaToRomaji[nextKana]?.[0];
+        if (nextOpt && key === nextOpt[0]) {
+          kanaIndex++;
+          matched = true;
+        }
+      }
     }
-  } else {
-    romajiEl.classList.add("mistype");
-    setTimeout(() => romajiEl.classList.remove("mistype"), 150);
-  }
-});
+
+    // ==== 長音（ー） ====
+    if (!matched && currentKana === "ー") {
+      typedRomaji += key;
+      kanaIndex++;
+      matched = true;
+    }
+
+    // ==== 結果 ====
+    if (matched) {
+      updateDisplay();
+      if (kanaIndex >= kanaSeq.length) {
+        score++;
+        typedWords.push(currentWord.jp);
+        nextWord();
+      }
+    } else {
+      romajiEl.classList.add("mistype");
+      setTimeout(() => romajiEl.classList.remove("mistype"), 150);
+    }
+  });
 
   // ===================================
   // 10. 終了
@@ -273,3 +276,5 @@ document.addEventListener("keydown", (e) => {
   startBtn.addEventListener("click", startGame);
   retryBtn.addEventListener("click", startGame);
 });
+
+
