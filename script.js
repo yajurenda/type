@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+const footerLink = document.getElementById("footer-link");
+footerLink.addEventListener("click", () => {
+  window.open("https://github.com/yajurenda/type/blob/main/README.md", "_blank");
+});
+
   // ===================================
   // 1. 仮名 → ローマ字マップ（完全対応）
   // ===================================
