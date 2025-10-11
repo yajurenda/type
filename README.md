@@ -4,9 +4,6 @@
 # あそぶ
 https://tdkrtype.vercel.app
 
-# つくったひと
-田所工事中 ( https://bento.me/tdkrkuj )
-
 # しゅうろく
 このタイピングで出てくる単語一覧です。
 >単語募集もやっています。良かったら送ってください。https://forms.gle/TNsq6fr1ZCViSph1A
@@ -34,3 +31,6 @@ https://tdkrtype.vercel.app
 満州
 ちんすこう
 </details>
+
+# つくったひと
+田所工事中 ( https://bento.me/tdkrkuj )
