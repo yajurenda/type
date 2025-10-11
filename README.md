@@ -7,10 +7,9 @@ https://tdkrtype.vercel.app
 # つくったひと
 田所工事中 ( https://bento.me/tdkrkuj )
 
-# 収録単語
+# しゅうろく
 このタイピングで出てくる単語一覧です。
->単語募集もやっています。
->良かったら送ってください。https://forms.gle/TNsq6fr1ZCViSph1A
+>単語募集もやっています。良かったら送ってください。https://forms.gle/TNsq6fr1ZCViSph1A
 
 <details>
 <summary>収録単語</summary>
