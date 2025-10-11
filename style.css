@@ -127,3 +127,18 @@ button:hover {
   color: limegreen;
   font-weight: bold;
 }
+
+.typed {
+  color: #4ade80; /* 明るい緑（打てた部分） */
+  font-weight: bold;
+}
+.remaining {
+  color: #aaa; /* 残り部分をグレー表示 */
+}
+.mistype {
+  animation: flashRed 0.15s;
+}
+@keyframes flashRed {
+  0% { color: red; }
+  100% { color: inherit; }
+}
