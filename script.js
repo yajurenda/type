@@ -1,93 +1,91 @@
-const targetWordDisplay = document.getElementById('target-word');
-const inputArea = document.getElementById('input-area');
-const timerDisplay = document.getElementById('timer');
-const scoreDisplay = document.getElementById('score');
-const startButton = document.getElementById('start-button');
-const typeSound = document.getElementById('type-sound');
-const gameOverSound = document.getElementById('game-over-sound');
-
 const words = [
-    "野獣先輩", "イキスギ", "やりますねぇ", "野獣の咆哮", "ｱｰｲｷｿ",
-    "あーソレいいよ", "アイスティーしかなかったんだけどいいかな", "頭にきますよ", "暴れんなよ", "ありますあります",
-    "いいよこいよ", "王道を征く", "アォン", "オォン", "おかのした",
-    "お前の事が好きだったんだよ", "俺もやったんだからさ", "おまたせ", "溜まってんなぁおい", "硬くなってんぜ",
-    "悔い改めて", "これもうわかんねぇな", "この辺がセクシーエロい", "じゃけん夜行きましょうね", "ちょっと歯ぁ当たんよ",
-    "で、でますよ", "出しちゃっていいっすか", "ないです", "ヌッ", "ぬわああん疲れたもおおおん",
-    "白菜かけますね", "はっきりわかんだね", "ファッ", "ふたいたいは", "ブッチッパ",
-    "ホラホラホラホラ", "ま多少はね", "やっぱ好きなんすねぇ", "辞めたくなりますよ", "ンアッー",
-    "はぇーすっごいおっきい", "まずいですよ", "当たり前だよなぁ", "あっそうだ", "あっそっかぁ",
-    "いいゾこれ", "噓つけ絶対見てたゾ", "おっそうだな", "じゃあぶち込んでやるぜ", "そうだよ",
-    "どうすっかな俺もな", "腹減ったなぁ", "冷えてるか", "見たけりゃ見せてやるよ", "みろよみろよ",
-    "オナシャス", "センセンシャル", "ワン", "おいゴルァ", "あくしろよ",
-    "やだよ", "じゃあ俺ギャラもらって帰るから", "しゃぶれよ", "はやく帰って宿題しなきゃ", "ほんとぉ",
-    "やめちくり～", "気持ちよくできましたか", "じゃあオラオラ来いよオラァ", "ありがとナス", "ウッソだろお前",
-    "かりこまり", "悲しいなぁ", "髪なんか必要ねぇんだよ", "もう許せるぞオイ"
+  { jp: "フェラーリ", reading: "ふぇらーり", romaji: "ferari" },
+  { jp: "写生大会", reading: "しゃせいたいかい", romaji: "shaseitaikai" },
+  { jp: "お賃金", reading: "おちんぎん", romaji: "ochingin" },
+  { jp: "漫湖", reading: "まんこ", romaji: "manko" },
+  { jp: "アナリスト", reading: "あなりすと", romaji: "anaristo" },
+  { jp: "万華鏡", reading: "まんげきょう", romaji: "mangekyou" },
+  { jp: "オスマン帝国", reading: "おすまんていこく", romaji: "osumanteikoku" },
+  { jp: "一万個", reading: "いちまんこ", romaji: "ichimanko" },
+  { jp: "π", reading: "ぱい", romaji: "pai" },
+  { jp: "マンホール", reading: "まんほーる", romaji: "manhoru" },
+  { jp: "満月", reading: "まんげつ", romaji: "mangetsu" },
+  { jp: "ちんちん電車", reading: "ちんちんでんしゃ", romaji: "chinchindensha" },
+  { jp: "不正行為", reading: "ふせいこうい", romaji: "fuseikoui" },
+  { jp: "節句", reading: "せっく", romaji: "sekku" },
+  { jp: "デンマーク", reading: "でんまーく", romaji: "denmaaku" },
+  { jp: "手抜き", reading: "てぬき", romaji: "tenuki" },
+  { jp: "鎮火", reading: "ちんか", romaji: "chinka" },
+  { jp: "満州", reading: "まんしゅう", romaji: "manshuu" },
+  { jp: "ちんすこう", reading: "ちんすこう", romaji: "chinsukou" },
 ];
 
-let currentWord = '';
-let score = 0;
-let timeLeft = 45;
+let currentIndex = 0;
+let time = 45;
 let timerInterval;
-let gameActive = false;
+let score = 0;
+let typedWords = [];
 
-function getRandomWord() {
-    return words[Math.floor(Math.random() * words.length)];
-}
+const startBtn = document.getElementById("start-btn");
+const retryBtn = document.getElementById("retry-btn");
+const startScreen = document.getElementById("start-screen");
+const typingArea = document.getElementById("typing-area");
+const resultScreen = document.getElementById("result-screen");
+const wordEl = document.getElementById("word");
+const readingEl = document.getElementById("reading");
+const romajiEl = document.getElementById("romaji");
+const timerEl = document.getElementById("timer");
+const scoreEl = document.getElementById("score");
+const wordListEl = document.getElementById("word-list");
 
 function startGame() {
-    if (gameActive) return;
-    gameActive = true;
-    score = 0;
-    timeLeft = 45;
-    scoreDisplay.textContent = `スコア: ${score}`;
-    timerDisplay.textContent = `残り時間: ${timeLeft}秒`;
-    inputArea.disabled = false;
-    inputArea.value = '';
-    inputArea.focus();
-    startButton.disabled = true;
-    startButton.textContent = 'プレイ中...';
+  startScreen.classList.add("hidden");
+  resultScreen.classList.add("hidden");
+  typingArea.classList.remove("hidden");
+  score = 0;
+  typedWords = [];
+  time = 45;
+  timerEl.textContent = time;
+  nextWord();
 
-    currentWord = getRandomWord();
-    targetWordDisplay.textContent = currentWord;
-
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        timerDisplay.textContent = `残り時間: ${timeLeft}秒`;
-        if (timeLeft <= 0) {
-            endGame();
-        }
-    }, 1000);
-}
-
-function endGame() {
-    gameActive = false;
-    clearInterval(timerInterval);
-    inputArea.disabled = true;
-    startButton.disabled = false;
-    startButton.textContent = 'ゲーム開始';
-    targetWordDisplay.textContent = 'タイムアップ！';
-    gameOverSound.play();
-}
-
-inputArea.addEventListener('input', () => {
-    if (!gameActive) return;
-
-    const typedText = inputArea.value;
-    if (typedText === currentWord) {
-        score++;
-        scoreDisplay.textContent = `スコア: ${score}`;
-        currentWord = getRandomWord();
-        targetWordDisplay.textContent = currentWord;
-        inputArea.value = '';
-        typeSound.play();
-    } else if (typedText.length > 0) {
-        // タイプ音が鳴る条件を簡略化。文字入力があるたびに鳴らす。
-        // より正確にするなら、currentWordの対応する文字が入力されたら鳴らすなどの実装も可能
-        typeSound.play();
+  timerInterval = setInterval(() => {
+    time--;
+    timerEl.textContent = time;
+    if (time <= 0) {
+      endGame();
     }
+  }, 1000);
+}
+
+function nextWord() {
+  const random = words[Math.floor(Math.random() * words.length)];
+  currentIndex = 0;
+  readingEl.textContent = random.reading;
+  wordEl.textContent = random.jp;
+  romajiEl.textContent = random.romaji;
+}
+
+document.addEventListener("keydown", (e) => {
+  if (typingArea.classList.contains("hidden")) return;
+
+  const currentWord = romajiEl.textContent;
+  if (e.key === currentWord[currentIndex]) {
+    currentIndex++;
+    if (currentIndex === currentWord.length) {
+      score++;
+      typedWords.push(wordEl.textContent);
+      nextWord();
+    }
+  }
 });
 
-startButton.addEventListener('click', startGame);
+function endGame() {
+  clearInterval(timerInterval);
+  typingArea.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+  scoreEl.textContent = score;
+  wordListEl.innerHTML = typedWords.map(w => `<li>${w}</li>`).join("");
+}
 
-// 初期状態では入力欄を無効にする
-inputArea.disabled = true;
+startBtn.addEventListener("click", startGame);
+retryBtn.addEventListener("click", startGame);
