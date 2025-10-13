@@ -3,6 +3,7 @@
 
 # あそぶ
 https://tdkrtype.vercel.app
+( https://superb-brigadeiros-ef3fba.netlify.app )
 
 # ちゅうい
 1.バグあるかも
@@ -21,24 +22,43 @@ https://tdkrtype.vercel.app
 <summary>収録単語</summary>
   
 フェラーリ
+
 写生大会
+
 お賃金
+
 漫湖
+
 アナリスト
+
 万華鏡
+
 オスマン帝国
+
 一万個
+
 π
+
 マンホール
+
 満月
+
 ちんちん電車
+
 不正行為
+
 節句
+
 デンマーク
+
 手抜き
+
 鎮火
+
 満州
+
 ちんすこう
+
 </details>
 
 # こーど
