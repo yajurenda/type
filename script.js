@@ -157,20 +157,24 @@ footerLink.addEventListener("click", () => {
   // ===================================
   // 8. 表示更新
   // ===================================
-  function updateDisplay() {
-    const romajiSeq = toRomajiSequence(currentWord.reading).flat();
-    let fullRomaji = romajiSeq.join("");
-    let progressRomaji = "";
-    for (let i = 0; i < kanaIndex; i++) {
-      progressRomaji += romajiSeq[i];
-    }
-    progressRomaji += typedRomaji;
+function updateDisplay() {
+  const word = currentWord.word;
+  const reading = currentWord.reading;
 
-    romajiEl.innerHTML = `
-      <span class="typed">${progressRomaji}</span>
-      <span class="remaining">${fullRomaji.slice(progressRomaji.length)}</span>
-    `;
-  }
+  // 進行状態を反映
+  const typedKana = reading.slice(0, kanaIndex);
+  const remainingKana = reading.slice(kanaIndex);
+
+  const typedWord = word.slice(0, kanaIndex);
+  const remainingWord = word.slice(kanaIndex);
+
+  readingEl.innerHTML = `
+    <span class="typed">${typedKana}</span><span class="remaining">${remainingKana}</span>
+  `;
+  wordEl.innerHTML = `
+    <span class="typed">${typedWord}</span><span class="remaining">${remainingWord}</span>
+  `;
+}
 
   // ===================================
   // 9. 入力処理
