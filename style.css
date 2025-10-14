@@ -162,3 +162,22 @@ button:hover {
 #romaji {
   display: none;
 }
+
+#reading .typed,
+#word .typed {
+  color: #22c55e; /* 打った部分：緑 */
+}
+
+#reading .remaining,
+#word .remaining {
+  color: #9ca3af; /* 残り：グレー */
+}
+
+.flash-red {
+  animation: flashRed 0.2s ease;
+}
+
+@keyframes flashRed {
+  0% { color: red; }
+  100% { color: inherit; }
+}
