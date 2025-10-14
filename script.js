@@ -185,97 +185,82 @@ function updateDisplay() {
   `;
 }
 
-  // ===================================
-  // 9. 入力処理
-  // ===================================
-  document.addEventListener("keydown", (e) => {
-    if (typingArea.classList.contains("hidden")) return;
-    const key = e.key.toLowerCase();
-    if (!/^[a-z]$/.test(key)) return;
+// ===================================
+// 9. 入力処理
+// ===================================
+document.addEventListener("keydown", (e) => {
+  if (typingArea.classList.contains("hidden")) return;
+  const key = e.key.toLowerCase();
+  if (!/^[a-z]$/.test(key)) return;
 
-    const kanaSeq = toRomajiSequence(currentWord.reading);
-    if (kanaIndex >= kanaSeq.length) return;
+  const kanaSeq = toRomajiSequence(currentWord.reading);
+  if (kanaIndex >= kanaSeq.length) return;
 
-    let currentKana = currentWord.reading[kanaIndex];
-    let romajiOptions = kanaSeq[kanaIndex];
-    let matched = false;
+  let currentKana = currentWord.reading[kanaIndex];
+  let romajiOptions = kanaSeq[kanaIndex];
+  let matched = false;
 
-    // 「ん」処理
-    if (currentKana === "ん") {
-      const nextKana = currentWord.reading[kanaIndex + 1];
-      const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
-      const nextInitial = nextRomaji ? nextRomaji[0] : "";
+  // 「ん」処理
+  if (currentKana === "ん") {
+    const nextKana = currentWord.reading[kanaIndex + 1];
+    const nextRomaji = nextKana ? kanaToRomaji[nextKana]?.[0] || "" : "";
+    const nextInitial = nextRomaji ? nextRomaji[0] : "";
 
-      if (typedRomaji === "" && key === "n") {
-        typedRomaji = "n";
+    if (typedRomaji === "" && key === "n") {
+      typedRomaji = "n";
+      matched = true;
+      if (!"aiueony".includes(nextInitial)) {
+        kanaIndex++;
+        typedRomaji = "";
+      }
+    } else if (typedRomaji === "n" && key === "n") {
+      kanaIndex++;
+      typedRomaji = "";
+      matched = true;
+    } else if (typedRomaji === "n" && key !== "n") {
+      kanaIndex++;
+      typedRomaji = "";
+      matched = false;
+    }
+  }
+
+  // 通常処理
+  if (!matched) {
+    for (let opt of romajiOptions) {
+      if (opt.startsWith(typedRomaji + key)) {
+        typedRomaji += key;
         matched = true;
-        if (!"aiueony".includes(nextInitial)) {
+        if (typedRomaji === opt) {
           kanaIndex++;
           typedRomaji = "";
         }
-      } else if (typedRomaji === "n" && key === "n") {
+        break;
+      }
+    }
+  }
+
+  // 促音「っ」
+  if (!matched && currentKana === "っ") {
+    const nextKana = currentWord.reading[kanaIndex + 1];
+    if (nextKana) {
+      const nextOpt = kanaToRomaji[nextKana]?.[0];
+      if (nextOpt && key === nextOpt[0]) {
         kanaIndex++;
-        typedRomaji = "";
         matched = true;
-      } else if (typedRomaji === "n" && key !== "n") {
-        kanaIndex++;
-        typedRomaji = "";
-        matched = false;
       }
     }
+  }
 
-    // 通常処理
-    if (!matched) {
-      for (let opt of romajiOptions) {
-        if (opt.startsWith(typedRomaji + key)) {
-          typedRomaji += key;
-          matched = true;
-          if (typedRomaji === opt) {
-            kanaIndex++;
-            typedRomaji = "";
-          }
-          break;
-        }
-      }
-    }
+  // 長音「ー」
+  if (!matched && currentKana === "ー") {
+    kanaIndex++;
+    matched = true;
+  }
 
-    // 促音「っ」
-    if (!matched && currentKana === "っ") {
-      const nextKana = currentWord.reading[kanaIndex + 1];
-      if (nextKana) {
-        const nextOpt = kanaToRomaji[nextKana]?.[0];
-        if (nextOpt && key === nextOpt[0]) {
-          kanaIndex++;
-          matched = true;
-        }
-      }
-    }
-
-    // 長音「ー」
-    if (!matched && currentKana === "ー") {
-      kanaIndex++;
-      matched = true;
-    }
-
-    if (matched) {
-      updateDisplay();
-      if (kanaIndex >= kanaSeq.length) {
-        score++;
-        typedWords.push(currentWord.jp);
-        nextWord();
-      }
-    } else {
-      romajiEl.classList.add("mistype");
-      setTimeout(() => romajiEl.classList.remove("mistype"), 150);
-    }
-  });
-
- // ========================
-  // ✅ 打鍵音を追加
-  // ========================
+  // ✅ 打鍵音を追加（ここに移動！）
   if (matched) {
     const sound = new Audio("type.mp3");
-    sound.volume = 0.5; // 音量調整（0.0〜1.0）
+    sound.volume = 0.5;
     sound.currentTime = 0;
     sound.play();
 
