@@ -270,6 +270,27 @@ function updateDisplay() {
     }
   });
 
+ // ========================
+  // ✅ 打鍵音を追加
+  // ========================
+  if (matched) {
+    const sound = new Audio("type.mp3");
+    sound.volume = 0.5; // 音量調整（0.0〜1.0）
+    sound.currentTime = 0;
+    sound.play();
+
+    updateDisplay();
+    if (kanaIndex >= kanaSeq.length) {
+      score++;
+      typedWords.push(currentWord.jp);
+      nextWord();
+    }
+  } else {
+    romajiEl.classList.add("mistype");
+    setTimeout(() => romajiEl.classList.remove("mistype"), 150);
+  }
+});
+
   // ===================================
   // 10. ゲーム終了
   // ===================================
