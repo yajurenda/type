@@ -181,3 +181,12 @@ button:hover {
   0% { color: red; }
   100% { color: inherit; }
 }
+
+.typed {
+  color: #4ade80; /* 打った部分：緑 */
+  transition: color 0.2s ease;
+}
+.remaining {
+  color: #fff;
+  opacity: 0.6;
+}
