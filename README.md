@@ -3,7 +3,6 @@
 
 # あそぶ
 https://tdkrtype.vercel.app
-( https://superb-brigadeiros-ef3fba.netlify.app )
 
 # ちゅうい
 1.バグあるかも
